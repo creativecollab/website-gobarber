@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { shade } from 'polished';
-import bkgSignIn from '../../assets/sign-in-background.png';
+import bkgSignUp from '../../assets/signUp-bkg.png';
 
 export const Container = styled.div`
   height: 100vh;
@@ -43,7 +43,7 @@ export const Content = styled.section`
 
   > a {
     margin-top: 20px;
-    color: #ff9000;
+    color: #f4ede8;
     display: block;
     text-decoration: none;
     transition: color 2s;
@@ -58,14 +58,14 @@ export const Content = styled.section`
     }
 
     &:hover {
-      color: ${shade(0.2, '#ff9000')};
+      color: ${shade(0.2, '#f4ede8')};
     }
   }
 `;
 
 export const Background = styled.div`
   flex: 1;
-  background-image: url(${bkgSignIn});
+  background-image: url(${bkgSignUp});
   background-repeat: no-repeat;
   background-position: center, center;
   background-size: cover;
