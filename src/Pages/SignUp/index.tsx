@@ -5,7 +5,7 @@ import React, { useRef, useCallback } from 'react';
  * Type: Rotas
  */
 
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 /*
  * Library: React Icons
@@ -42,75 +42,107 @@ import Input from '../../Components/Input';
 import Button from '../../Components/Button';
 
 // STYLES
-import { Container, Content, Background } from './styles';
+import { Container, Content, AnimationContainer, Background } from './styles';
 
 // LOGO DO APP
 import logo from '../../assets/logo.svg';
 
+import Api from '../../Services/Api';
+
+import { useToast } from '../../Hooks/Toast';
+
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+}
+
 const SignUp: React.FC = () => {
+  const { addToast } = useToast();
+  const history = useHistory();
   const formRef = useRef<FormHandles>(null);
 
-  console.log(formRef);
+  const handleRegister = useCallback(
+    async (data: FormData) => {
+      try {
+        formRef.current?.setErrors({});
 
-  const handleRegister = useCallback(async (data: object) => {
-    try {
-      formRef.current?.setErrors({});
+        const schema = Yup.object().shape({
+          name: Yup.string().required('O Campo Nome é Obrigatório'),
+          email: Yup.string()
+            .required('O Campo Email é Obrigatório')
+            .email('Email Inválido'),
+          password: Yup.string().min(8, 'No minimo 8 Digitos'),
+        });
 
-      const schema = Yup.object().shape({
-        name: Yup.string().required('O Campo Nome é Obrigatório'),
-        email: Yup.string()
-          .required('O Campo Email é Obrigatório')
-          .email('Email Inválido'),
-        password: Yup.string().min(8, 'No minimo 8 Digitos'),
-      });
+        await schema.validate(data);
 
-      await schema.validate(data);
+        await Api.post('/users', data);
 
-      console.log(data);
-    } catch (error) {
-      const errors = GetValidateError(error);
+        addToast({
+          type: 'success',
+          title: 'Cadastrado',
+          description: 'Usuario registrado com Sucesso',
+        });
 
-      formRef.current?.setErrors(errors);
-    }
-  }, []);
+        history.push('/');
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          const errors = GetValidateError(error);
+
+          formRef.current?.setErrors(errors);
+          return;
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Erro ao Cadastrar',
+          description: 'Erro ao registrar o Usuario',
+        });
+      }
+    },
+    [addToast, history],
+  );
 
   return (
     <Container>
       <Background />
       <Content>
-        <img src={logo} alt="goBarber" />
+        <AnimationContainer>
+          <img src={logo} alt="goBarber" />
 
-        <Form ref={formRef} onSubmit={handleRegister}>
-          <h1>Faça Seu Cadastro</h1>
+          <Form ref={formRef} onSubmit={handleRegister}>
+            <h1>Faça Seu Cadastro</h1>
 
-          <Input
-            name="name"
-            type="text"
-            placeholder="Seu nome Completo"
-            icon={FiUser}
-          />
+            <Input
+              name="name"
+              type="text"
+              placeholder="Seu nome Completo"
+              icon={FiUser}
+            />
 
-          <Input
-            name="email"
-            type="email"
-            placeholder="Seu Email"
-            icon={FiMail}
-          />
+            <Input
+              name="email"
+              type="email"
+              placeholder="Seu Email"
+              icon={FiMail}
+            />
 
-          <Input
-            name="password"
-            type="password"
-            placeholder="Sua Senha"
-            icon={FiLock}
-          />
+            <Input
+              name="password"
+              type="password"
+              placeholder="Sua Senha"
+              icon={FiLock}
+            />
 
-          <Button type="submit">Cadastrat</Button>
-        </Form>
+            <Button type="submit">Cadastrat</Button>
+          </Form>
 
-        <Link to="/">
-          <FiArrowLeft />
-          Já tenho Conta
-        </Link>
+          <Link to="/">
+            <FiArrowLeft />
+            Já tenho Conta
+          </Link>
+        </AnimationContainer>
       </Content>
     </Container>
   );

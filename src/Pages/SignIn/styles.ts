@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { shade } from 'polished';
 import bkgSignIn from '../../assets/sign-in-background.png';
 
@@ -13,9 +13,28 @@ export const Content = styled.section`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
   width: 100%;
   max-width: 45em;
+`;
+
+const AnimatedFromLeft = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to{
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+export const AnimationContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  animation: ${AnimatedFromLeft} 2s;
 
   form {
     width: 25em;
